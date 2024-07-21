@@ -1,0 +1,161 @@
+package com.monocept.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import com.monocept.entity.Student;
+
+public class StudentDBUtil {
+	private DataSource dataSource;
+
+	public StudentDBUtil(DataSource datasource) {
+		super();
+		this.dataSource = datasource;
+	}
+
+	public List<Student> getStudentList() {
+		List<Student> students = new ArrayList<Student>();
+		Connection connection;
+		try {
+			connection = dataSource.getConnection();
+			Statement createStatement = connection.createStatement();
+			String selectQuery = "select * from student";
+			ResultSet executeQuery = createStatement.executeQuery(selectQuery);
+			while (executeQuery.next()) {
+				int rollNumber = executeQuery.getInt("rollnumber");
+				String name = executeQuery.getString("name");
+				int percentage = executeQuery.getInt("percentage");
+				Student student = new Student(rollNumber, name, percentage);
+				students.add(student);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return students;
+
+	}
+
+	public boolean addStudent(Student student) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		String insertQuery = "insert into student(name,percentage) values(?,?)";
+		PreparedStatement prepareStatement = connection.prepareStatement(insertQuery);
+		prepareStatement.setString(1, student.getName());
+		prepareStatement.setInt(2, student.getPercentage());
+		int executeUpdate = prepareStatement.executeUpdate();
+		return executeUpdate == 1;
+
+	}
+
+	public Student getStudent(int rollnumber) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		String sql = "select * from student where rollnumber=?";
+		
+		PreparedStatement prepareStatement = connection.prepareStatement(sql);
+		prepareStatement.setInt(1, rollnumber);
+		ResultSet rs = prepareStatement.executeQuery();
+		while(rs.next()) {
+			String name=rs.getString(2);
+			int percentage=rs.getInt(3);
+			return new Student(rollnumber,name,percentage);
+		}
+		return null;
+
+	}
+
+	public boolean deleteStudent(int rollnumber) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		String deleteQuery="delete from student where rollnumber=?";
+		PreparedStatement prepareStatement = connection.prepareStatement(deleteQuery);
+		prepareStatement.setInt(1, rollnumber);
+		int executeUpdate = prepareStatement.executeUpdate();
+		return executeUpdate==1;
+		
+		
+	}
+
+	public boolean updateStudent(Student student) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		String updateQuery="update student set name=?,percentage=? where rollnumber=?";
+		PreparedStatement prepareStatement = connection.prepareStatement(updateQuery);
+		prepareStatement.setString(1, student.getName());
+		prepareStatement.setInt(2, student.getPercentage());
+		prepareStatement.setInt(3, student.getRollNumber());
+		
+		int executeUpdate = prepareStatement.executeUpdate();
+		
+		return executeUpdate==1;
+		
+		
+	}
+
+	public List<Student> getStudentSearchOnRollnumber(int rollnumber) {
+		List<Student> students = new ArrayList<Student>();
+		Connection connection;
+		try {
+			connection = dataSource.getConnection();
+			String selectQuery = "select * from student where rollnumber=?";
+			PreparedStatement prepareStatement = connection.prepareStatement(selectQuery);
+			prepareStatement.setInt(1, rollnumber);
+			ResultSet executeQuery = prepareStatement.executeQuery();
+			while (executeQuery.next()) {
+				String name = executeQuery.getString("name");
+				int percentage = executeQuery.getInt("percentage");
+				Student student = new Student(rollnumber, name, percentage);
+				students.add(student);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return students;
+	}
+
+	public List<Student> getStudentSearchOnName(String name) {
+		List<Student> students = new ArrayList<Student>();
+		Connection connection;
+		try {
+			connection = dataSource.getConnection();
+			String selectQuery = "select * from student where name like ?";
+			PreparedStatement prepareStatement = connection.prepareStatement(selectQuery);
+			prepareStatement.setString(1, "%"+name+"%");
+			ResultSet executeQuery = prepareStatement.executeQuery();
+			while (executeQuery.next()) {
+				int rollNumber = executeQuery.getInt("rollnumber");
+				int percentage = executeQuery.getInt("percentage");
+				Student student = new Student(rollNumber, name, percentage);
+				students.add(student);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return students;
+	}
+
+	public List<Student> getStudentSearchOnPercentage(int percentage) {
+		List<Student> students = new ArrayList<Student>();
+		Connection connection;
+		try {
+			connection = dataSource.getConnection();
+			String selectQuery = "select * from student where percentage=?";
+			PreparedStatement prepareStatement = connection.prepareStatement(selectQuery);
+			prepareStatement.setInt(1, percentage);
+			ResultSet executeQuery = prepareStatement.executeQuery();
+			while (executeQuery.next()) {
+				String name = executeQuery.getString("name");
+				int rollnumber = executeQuery.getInt("rollnumber");
+				Student student = new Student(rollnumber, name, percentage);
+				students.add(student);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return students;
+	}
+
+}

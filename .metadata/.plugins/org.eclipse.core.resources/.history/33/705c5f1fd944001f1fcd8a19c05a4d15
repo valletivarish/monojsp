@@ -1,0 +1,172 @@
+package com.monocept.controller;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
+import com.monocept.dao.StudentDBUtil;
+import com.monocept.entity.Student;
+
+@WebServlet("/student")
+public class StudentController extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	private StudentDBUtil studentDbUtil;
+
+	@Resource(name = "jdbc/studentdb")
+	private DataSource dataSource;
+
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		studentDbUtil = new StudentDBUtil(dataSource);
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String command = request.getParameter("command");
+		if (command == null) {
+			command = "list";
+		}
+		try {
+
+			switch (command) {
+			case "add":
+				addStudent(request, response);
+				break;
+			case "load":
+				loadStudent(request, response);
+				break;
+			case "update":
+				updateStudent(request, response);
+				break;
+			case "delete":
+				deleteStudent(request, response);
+				break;
+			case "search":
+				searchStudent(request, response);
+				break;
+			default:
+				listStudent(request, response);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ServletException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void searchStudent(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    List<Student> students = null;
+	    String searchType = request.getParameter("select");
+	    String searchTerm = request.getParameter("search");
+	    
+	    if (searchType != null && searchTerm != null) {
+	        switch (searchType) {
+	            case "rollnumber":
+	                int rollnumber = Integer.parseInt(searchTerm);
+	                students = studentDbUtil.getStudentSearchOnRollnumber(rollnumber);
+	                break;
+	            case "name":
+	                students = studentDbUtil.getStudentSearchOnName(searchTerm);
+	                break;
+	            case "percentage":
+	                int percentage = Integer.parseInt(searchTerm);
+	                students = studentDbUtil.getStudentSearchOnPercentage(percentage);
+	                break;
+	            default:
+	                students = studentDbUtil.getStudentList();
+	        }
+	    } else {
+	        students = studentDbUtil.getStudentList();
+	    }
+	    
+	    request.setAttribute("theStudentList", students);
+	    RequestDispatcher requestDispatcher = request.getRequestDispatcher("list-of-students.jsp");
+	    requestDispatcher.forward(request, response);
+	}
+
+
+	private void updateStudent(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+		String name = request.getParameter("name");
+		int rollnumber = Integer.parseInt(request.getParameter("rollnumber"));
+		int percentage = Integer.parseInt(request.getParameter("percentage"));
+		Student student=new Student(rollnumber,name,percentage);
+		boolean isUpdated=studentDbUtil.updateStudent(student);
+		if(isUpdated) {
+			response.sendRedirect(request.getContextPath() + "/student");
+		}
+		
+	}
+
+	private void loadStudent(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, SQLException, ServletException {
+		int rollnumber=Integer.parseInt((request.getParameter("rollnumber")));
+		System.out.println("Update "+rollnumber);
+		Student student=studentDbUtil.getStudent(rollnumber);
+		System.out.println(student);
+		request.setAttribute("TheStudent", student);
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher("update-student.jsp");
+		requestDispatcher.forward(request, response);
+		
+		
+	}
+
+	private void deleteStudent(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+		int rollnumber=Integer.parseInt((request.getParameter("rollnumber")));
+		System.out.println("Delete "+rollnumber);
+		boolean isDeleted=studentDbUtil.deleteStudent(rollnumber);
+		if(isDeleted) {
+			response.sendRedirect(request.getContextPath() + "/student");
+		}
+		
+	}
+
+	private void addStudent(HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, ServletException, IOException {
+		String name = request.getParameter("name");
+		String percentageParameter = request.getParameter("percentage");
+		int percentage = 0;
+		try {
+			if (percentageParameter != null && !percentageParameter.isEmpty()) {
+				percentage = Integer.parseInt(percentageParameter);
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		Student student = new Student(name, percentage);
+		boolean isAdded = studentDbUtil.addStudent(student);
+		if (isAdded) {
+//			response.sendRedirect(request.getContextPath() + "/student");
+			listStudent(request,response);
+
+		}
+
+	}
+
+	private void listStudent(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		List<Student> students = studentDbUtil.getStudentList();
+		request.setAttribute("theStudentList", students);
+		RequestDispatcher requestDispatcher = request.getRequestDispatcher("list-of-students.jsp");
+		requestDispatcher.forward(request, response);
+
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

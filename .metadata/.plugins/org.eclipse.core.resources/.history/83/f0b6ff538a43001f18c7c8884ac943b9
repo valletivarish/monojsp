@@ -1,0 +1,82 @@
+package com.monocept.jdbc;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
+@WebServlet("/EmployeeJdbcTest")
+public class EmployeeJdbcTest extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    @Resource(name = "jdbc/employeedb")
+    private DataSource dataSource;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            Connection connection = dataSource.getConnection();
+
+            // Perform operations
+            insertEmployee(connection);
+            updateEmployee(connection);
+            deleteEmployee(connection);
+            selectEmployees(connection);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void insertEmployee(Connection connection) throws SQLException {
+        String insertQuery = "insert into employee (id, name, salary) values (?, ?, ?)";
+        try (PreparedStatement prepareStatement = connection.prepareStatement(insertQuery)) {
+            prepareStatement.setInt(1, 6);
+            prepareStatement.setString(2, "Vicky");
+            prepareStatement.setDouble(3, 6000.0);
+            int executeUpdate = prepareStatement.executeUpdate();
+            System.out.println("Number of rows inserted : " + executeUpdate);
+        }
+    }
+
+    private void updateEmployee(Connection connection) throws SQLException {
+        String updateQuery = "update employee set name=? where id=?";
+        try (PreparedStatement prepareStatement = connection.prepareStatement(updateQuery)) {
+            prepareStatement.setString(1, "Rahul");
+            prepareStatement.setInt(2, 1);
+            int executeUpdate = prepareStatement.executeUpdate();
+            System.out.println("Number of rows updated : " + executeUpdate);
+        }
+    }
+
+    private void deleteEmployee(Connection connection) throws SQLException {
+        String deleteQuery = "delete from employee where id=?";
+        try (PreparedStatement prepareStatement = connection.prepareStatement(deleteQuery)) {
+            prepareStatement.setInt(1, 2);
+            int executeUpdate = prepareStatement.executeUpdate();
+            System.out.println("Number of rows deleted : " + executeUpdate);
+        }
+    }
+
+    private void selectEmployees(Connection connection) throws SQLException {
+        String selectQuery = "select * from employee";
+        try (PreparedStatement prepareStatement = connection.prepareStatement(selectQuery);
+             ResultSet executeQuery = prepareStatement.executeQuery()) {
+            System.out.println("Id\tName\tSalary");
+            System.out.println("------------------------");
+            while (executeQuery.next()) {
+                System.out.println(executeQuery.getInt(1) + "\t" + executeQuery.getString(2) + "\t" + executeQuery.getDouble(3));
+                System.out.println("------------------------");
+            }
+        }
+    }
+}

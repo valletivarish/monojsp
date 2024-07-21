@@ -1,0 +1,38 @@
+package com.monocept.entity;
+
+public class Student {
+	private int rollNumber;
+	private String name;
+	private String percentage;
+	@Override
+	public String toString() {
+		return "Student [rollNumber=" + rollNumber + ", name=" + name + ", email=" + percentage + "]";
+	}
+	public Student(int rollNumber, String name, String email) {
+		super();
+		this.rollNumber = rollNumber;
+		this.name = name;
+		this.percentage = email;
+	}
+	public int getRollNumber() {
+		return rollNumber;
+	}
+	public void setRollNumber(int rollNumber) {
+		this.rollNumber = rollNumber;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getEmail() {
+		return percentage;
+	}
+	public void setEmail(String email) {
+		this.percentage = email;
+	}
+
+	
+
+}

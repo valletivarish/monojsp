@@ -1,0 +1,82 @@
+package com.monocept.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import com.monocept.entity.Student;
+
+public class StudentDBUtil {
+	private DataSource dataSource;
+
+	public StudentDBUtil(DataSource datasource) {
+		super();
+		this.dataSource = datasource;
+	}
+
+	public List<Student> getStudentList() {
+		List<Student> students = new ArrayList<Student>();
+		Connection connection;
+		try {
+			connection = dataSource.getConnection();
+			Statement createStatement = connection.createStatement();
+			String selectQuery = "select * from student";
+			ResultSet executeQuery = createStatement.executeQuery(selectQuery);
+			while (executeQuery.next()) {
+				int rollNumber = executeQuery.getInt("rollnumber");
+				String name = executeQuery.getString("name");
+				int percentage = executeQuery.getInt("percentage");
+				Student student = new Student(rollNumber, name, percentage);
+				students.add(student);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return students;
+
+	}
+
+	public boolean addStudent(Student student) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		String insertQuery = "insert into student(name,percentage) values(?,?)";
+		PreparedStatement prepareStatement = connection.prepareStatement(insertQuery);
+		prepareStatement.setString(1, student.getName());
+		prepareStatement.setInt(2, student.getPercentage());
+		int executeUpdate = prepareStatement.executeUpdate();
+		return executeUpdate == 1;
+
+	}
+
+	public boolean updateStudent(Student student) throws SQLException {
+		Connection connection = dataSource.getConnection();
+		String updateQuery = null;
+		PreparedStatement prepareStatement;
+		if (student.getName().isEmpty()) {
+			updateQuery = "update student set percentage=? where rollnumber=?";
+			prepareStatement = connection.prepareStatement(updateQuery);
+			prepareStatement.setInt(1, student.getPercentage());
+			prepareStatement.setInt(2, student.getRollNumber());
+
+		} if(student.getPercentage()==0) {
+			updateQuery = "update student set name=? where rollnumber=?";
+			prepareStatement = connection.prepareStatement(updateQuery);
+			prepareStatement.setString(1, student.getName());
+			prepareStatement.setInt(2, student.getRollNumber());
+		}
+		else {
+			updateQuery = "update student set name=? and percentage=? where rollnumber=?";
+			prepareStatement = connection.prepareStatement(updateQuery);
+			prepareStatement.setString(1, student.getName());
+			prepareStatement.setInt(2, student.getPercentage());
+			prepareStatement.setInt(3, student.getRollNumber());
+		}
+		int executeUpdate = prepareStatement.executeUpdate();
+		return executeUpdate == 1;
+	}
+}

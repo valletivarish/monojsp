@@ -1,0 +1,40 @@
+package com.monocept.database;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+
+import javax.sql.DataSource;
+
+public class BankApplicationDbUtil {
+	private DataSource dataSource;
+	private PreparedStatement prepareStatement;
+	
+	public BankApplicationDbUtil(DataSource dataSource) {
+		this.dataSource=dataSource;
+	}
+
+	public boolean validateUser(String username, String password) throws SQLException {
+	    if (username == null || !username.matches("\\d+")) {
+	        return false;
+	    }
+		int customerUserId= Integer.parseInt(username);
+		Connection connection = dataSource.getConnection();
+		String selectQuery="select * from customer where customer_id=? and password=?";
+		prepareStatement = connection.prepareStatement(selectQuery);
+		prepareStatement.setInt(1, customerUserId);
+		ResultSet executeQuery = prepareStatement.executeQuery();
+		while(executeQuery.next()) {
+			int customerId=executeQuery.getInt("customer_id");
+			String passwordDB=executeQuery.getString("password");
+			if(customerId==customerUserId && passwordDB.equals(password)) {
+				return true;
+			}
+			
+		}
+		return false;
+		
+	}
+}
