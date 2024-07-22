@@ -5,8 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,10 +43,23 @@ public class BankApplicationDbUtil {
             preparedStatement.setString(2, password);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return resultSet.next(); // true if a row with matching username and password exists
+                return resultSet.next();
             }
         }
     }
+	public boolean validateAdmin(String username, String password) throws SQLException {
+        String selectQuery = "select * from admin where username=? and password=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+	}
 
     public void insertCustomer(Customer customer) throws SQLException {
         String insertQuery = "insert into customers(first_name, last_name, email_id, password) values (?, ?, ?, ?)";
@@ -388,4 +406,51 @@ public class BankApplicationDbUtil {
         }
         return transactions;
     }
+
+	public List<Transaction> getTransactionByDate(String formattedFromDate, String formattedToDate) throws SQLException {
+		List<Transaction> transactions=new ArrayList<Transaction>();
+		String selectQuery = "select * from transactions where Date(date_of_transaction) >=? and Date(date_of_transaction)<=?";
+		ResultSet resultSet=null;
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+        	preparedStatement.setString(1, formattedFromDate);
+        	preparedStatement.setString(2, formattedToDate);
+        	resultSet = preparedStatement.executeQuery();
+        	while(resultSet.next()) {
+        		int sender = resultSet.getInt("sender_account_number");
+                int receiver = resultSet.getInt("receiver_account_number");
+                String date = resultSet.getString("date_of_transaction");
+                String type = resultSet.getString("transaction_type");
+                double amount = resultSet.getDouble("transaction_amount");
+
+                Transaction transaction = new Transaction(sender, receiver, date, type, amount);
+                System.out.println(transaction);
+                transactions.add(transaction);
+        	}
+        	resultSet.close();
+        }
+		return transactions;
+	}
+
+	public List<Transaction> getPassbookByDate(int customer_id, LocalDate fromDate, LocalDate toDate) throws SQLException {
+	    List<Transaction> transactions = new ArrayList<>();
+	    List<Transaction> passbook = getPassbook(customer_id);
+
+
+	    LocalDateTime fromDateTime = fromDate.atStartOfDay();
+	    LocalDateTime toDateTime = toDate.atTime(23, 59, 59); 
+
+	    for (Transaction transaction : passbook) {
+	        LocalDateTime transactionDateTime = LocalDateTime.parse(transaction.getDate_of_transaction(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	        if (!transactionDateTime.isBefore(fromDateTime) && !transactionDateTime.isAfter(toDateTime)) {
+	            transactions.add(transaction);
+	        }
+	    }
+	    return transactions;
+	}
+
+
+
+
+
 }

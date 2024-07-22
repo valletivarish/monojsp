@@ -28,6 +28,7 @@ prefix="c"%>
       <a class="btn btn-secondary p-2 px-4" href="admin?command=admin"
         >Go Back</a
       >
+      <a class="btn btn-secondary p-2 px-4" aria-current="page" href="logout">Logout</a>
       <h1 class="text-center my-5">Customer Details</h1>
       <form action="admin" method="get">
         <div class="col-sm-10">

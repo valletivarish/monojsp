@@ -23,6 +23,7 @@ pageEncoding="UTF-8"%>
 	<div class="container-lg my-5">
 		<a class="btn btn-secondary p-2 px-4" href="user?command=user">Go
 			Back</a>
+		<a class="btn btn-secondary p-2 px-4" aria-current="page" href="logout">Logout</a>
 		<h1 class="text-center my-5">Passbook Details</h1>
 		<hr />
 		<p class="fs-3">
@@ -43,8 +44,14 @@ pageEncoding="UTF-8"%>
 			<div class="d-flex my-3">
 				<input type="text" class="form-control" name="searchValue"
 					placeholder="Search by sender and receiver account number" />
-				<input type="submit" class="btn btn-primary mx-2" value="Search" />
-				<i class="fa-solid fa-filter"></i>
+			</div>
+			<div class="d-flex my-3 align-items-center">
+				<label class="label me-2" for="from">From:</label> <input
+					type="date" id="from" name="from" class="form-control me-2">
+
+				<label class="label me-2" for="to">To:</label> <input type="date"
+					id="to" name="to" class="form-control me-2"> <input
+					type="submit" class="btn btn-primary" value="Search">
 			</div>
 		</form>
 

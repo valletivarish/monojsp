@@ -2,6 +2,8 @@ package com.monocept.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +80,8 @@ public class AdminController extends HttpServlet {
 		List<Transaction> transactions = new ArrayList<Transaction>();
 		String parameter = request.getParameter("select");
 		String searchValueParam = request.getParameter("searchValue");
+		String fromDateStr=request.getParameter("from");
+		String toDateStr=request.getParameter("to");
 		if (searchValueParam != null && !searchValueParam.isEmpty()) {
 			int searchValue = Integer.parseInt(searchValueParam);
 			if ("senderAccountNumber".equals(parameter)) {
@@ -85,7 +89,19 @@ public class AdminController extends HttpServlet {
 			} else if ("receiverAccountNumber".equals(parameter)) {
 				transactions = bankApplicationDbUtil.getTransactionByReceiverAccountNumber(searchValue);
 			}
-		} else {
+		}
+		else if(fromDateStr!=null && toDateStr!=null) {
+			DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	        LocalDate fromDate = LocalDate.parse(fromDateStr, inputFormatter);
+	        LocalDate toDate = LocalDate.parse(toDateStr, inputFormatter);
+
+	        String formattedFromDate = fromDate.format(outputFormatter);
+	        String formattedToDate = toDate.format(outputFormatter);
+			transactions=bankApplicationDbUtil.getTransactionByDate(formattedFromDate,formattedToDate);
+		}
+		else {
 			transactions = bankApplicationDbUtil.getTransactions();
 		}
 

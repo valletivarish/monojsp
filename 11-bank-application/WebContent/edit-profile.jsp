@@ -16,6 +16,7 @@ prefix="c"%>
   <body>
     <div class="container my-5">
       <a class="btn btn-secondary p-2 px-4" href="user?command=user">Go Back</a>
+      <a class="btn btn-secondary p-2 px-4" aria-current="page" href="logout">Logout</a>
       <h2 class="text-center my-5">Edit Your details</h2>
       <hr />
       <form action="user" method="post">

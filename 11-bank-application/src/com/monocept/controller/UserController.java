@@ -2,6 +2,9 @@ package com.monocept.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,32 +139,37 @@ public class UserController extends HttpServlet {
 	}
 
 	private void viewPassbook(HttpServletRequest request, HttpServletResponse response, int attribute)
-			throws SQLException, ServletException, IOException {
-		HttpSession session = request.getSession();
-		String usernameStr=(String) session.getAttribute("username");
-		int customer_id=0;
-		if(usernameStr!=null) {
-			customer_id=Integer.parseInt(usernameStr);
-			request.setAttribute("bankAccountNumber", bankApplicationDbUtil.getAccountNumber(customer_id));
-		}
-		List<Transaction> passbook = new ArrayList<Transaction>();
-		String parameter = request.getParameter("select");
-		String searchValueParam = request.getParameter("searchValue");
-		if (searchValueParam != null && !searchValueParam.isEmpty()) {
-			int searchValue = Integer.parseInt(searchValueParam);
-			if ("senderAccountNumber".equals(parameter)) {
-				passbook = bankApplicationDbUtil.getPassbookBySenderAccountNumber(searchValue,customer_id);
-			} else if ("receiverAccountNumber".equals(parameter)) {
-				passbook = bankApplicationDbUtil.getPassbookByReceiverAccountNumber(searchValue,customer_id);
-			}
-		} else {
-			passbook = bankApplicationDbUtil.getPassbook(attribute);
-		}
-		request.setAttribute("TheTransactions", passbook);
-		RequestDispatcher requestDispatcher = request.getRequestDispatcher("user-passbook.jsp");
-		requestDispatcher.forward(request, response);
-
-	}
+            throws SQLException, ServletException, IOException {
+        HttpSession session = request.getSession();
+        String usernameStr = (String) session.getAttribute("username");
+        int customer_id = 0;
+        if (usernameStr != null) {
+            customer_id = Integer.parseInt(usernameStr);
+            request.setAttribute("bankAccountNumber", bankApplicationDbUtil.getAccountNumber(customer_id));
+        }
+        List<Transaction> passbook = new ArrayList<Transaction>();
+        String parameter = request.getParameter("select");
+        String searchValueParam = request.getParameter("searchValue");
+        String fromDateStr = request.getParameter("from");
+        String toDateStr = request.getParameter("to");
+        if (searchValueParam != null && !searchValueParam.isEmpty()) {
+            int searchValue = Integer.parseInt(searchValueParam);
+            if ("senderAccountNumber".equals(parameter)) {
+                passbook = bankApplicationDbUtil.getPassbookBySenderAccountNumber(searchValue, customer_id);
+            } else if ("receiverAccountNumber".equals(parameter)) {
+                passbook = bankApplicationDbUtil.getPassbookByReceiverAccountNumber(searchValue, customer_id);
+            }
+        } else if (fromDateStr != null && toDateStr != null) {
+            LocalDate fromDate = LocalDate.parse(fromDateStr);
+            LocalDate toDate = LocalDate.parse(toDateStr);
+            passbook = bankApplicationDbUtil.getPassbookByDate(customer_id, fromDate, toDate);
+        } else {
+            passbook = bankApplicationDbUtil.getPassbook(attribute);
+        }
+        request.setAttribute("TheTransactions", passbook);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("user-passbook.jsp");
+        requestDispatcher.forward(request, response);
+    }
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
