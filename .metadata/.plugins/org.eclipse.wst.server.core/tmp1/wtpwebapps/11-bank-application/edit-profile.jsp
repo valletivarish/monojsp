@@ -16,6 +16,10 @@ prefix="c"%>
   <body>
     <div class="container my-5">
       <a class="btn btn-secondary p-2 px-4" href="user?command=user">Go Back</a>
+      <div class="d-flex justify-content-end">
+			<button onclick="window.location.href='login.jsp'"
+				class="btn btn-danger">Logout</button>
+		</div>
       <h2 class="text-center my-5">Edit Your details</h2>
       <hr />
       <form action="user" method="post">

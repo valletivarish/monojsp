@@ -21,12 +21,12 @@ prefix="c"%>
 
       .navbar-brand,
       .navbar-nav .nav-link {
-        color: #ffffff; /* White text */
+        color: #ffffff;
       }
 
       .navbar-brand:hover,
       .navbar-nav .nav-link:hover {
-        color: #adb5bd; /* Light grey text on hover */
+        color: #adb5bd; 
       }
 
       .jumbotron {
@@ -37,7 +37,7 @@ prefix="c"%>
         display: flex;
         align-items: center;
         justify-content: start;
-        color: #ffffff; /* White text */
+        color: #ffffff; 
         text-align: center;
       }
     </style>

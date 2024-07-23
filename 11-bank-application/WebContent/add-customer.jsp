@@ -17,7 +17,11 @@
 <body>
 	<div class="container my-5">
 		<a class="btn btn-secondary p-2 px-4" href="admin?command=admin">Go
-			Back</a> <a class="btn btn-secondary p-2 px-4" aria-current="page" href="logout">Logout</a>
+			Back</a>
+		<div class="d-flex justify-content-end">
+			<button onclick="window.location.href='login.jsp'"
+				class="btn btn-danger">Logout</button>
+		</div>
 		<h2 class="text-center my-5">Add Customer</h2>
 		<hr />
 		<form action="admin" method="post">
@@ -28,9 +32,9 @@
 			<div class="input-group input-group-lg mt-5">
 				<span class="input-group-text">First and Last name</span> <input
 					type="text" aria-label="First name" class="form-control"
-					placeholder="First Name" name="fname" /> <input
-					type="text" aria-label="Last name" class="form-control"
-					placeholder="Last Name" name="lname" />
+					placeholder="First Name" name="fname" /> <input type="text"
+					aria-label="Last name" class="form-control" placeholder="Last Name"
+					name="lname" />
 			</div>
 			<div class="input-group flex-nowrap input-group-lg mt-4">
 				<span class="input-group-text" id="addon-wrapping">Email</span> <input
@@ -43,14 +47,14 @@
 					aria-label="Password" aria-describedby="addon-wrapping"
 					name="password" id="password" />
 				<button type="button" class="btn btn-outline-primary"
-					onclick="togglePasswordVisibility()" tabindex="-1">
-					show password</button>
+					onclick="togglePasswordVisibility()" tabindex="-1">show
+					password</button>
 			</div>
 
 			<div class="col-sm-10 my-4">
 				<input type="submit" value="Submit"
-					class="btn btn-outline-primary btn-lg" /> <a
-					href="admin" class="btn btn-outline-primary btn-lg">Cancel</a>
+					class="btn btn-outline-primary btn-lg" /> <a href="admin"
+					class="btn btn-outline-primary btn-lg">Cancel</a>
 			</div>
 		</form>
 	</div>

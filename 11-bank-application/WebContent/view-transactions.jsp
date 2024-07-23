@@ -20,7 +20,6 @@
 	integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
 	crossorigin="anonymous"></script>
 <style>
-
 input[type="date"]::-webkit-clear-button {
 	display: none;
 }
@@ -57,15 +56,22 @@ input[type="date"], focus {
 <body class="bg-light">
 	<div class="container-lg my-5">
 		<a class="btn btn-secondary p-2 px-4" href="admin?command=admin">Go
-			Back</a> <a class="btn btn-secondary p-2 px-4" aria-current="page"
-			href="logout">Logout</a>
+			Back</a>
+		<!-- <a class="btn btn-secondary p-2 px-4" aria-current="page"
+			href="logout">Logout</a> -->
+		<div class="d-flex justify-content-end">
+			<button onclick="window.location.href='login.jsp'"
+				class="btn btn-danger">Logout</button>
+		</div>
 		<h1 class="text-center my-5">Transaction Details</h1>
-		<form action="admin" method="get">
+
+		<form action="admin" method="post">
 			<div class="col-sm-10">
 				<input type="hidden" name="command" value="viewTransactions" /> <select
 					class="form-select form-select-lg mb-3"
 					aria-label=".form-select-lg example" name="select">
-					<option selected disabled>Search By Sender and Receiver Account Number</option>
+					<option selected disabled>Search By Sender and Receiver
+						Account Number</option>
 					<option value="senderAccountNumber">Sender Account Number</option>
 					<option value="receiverAccountNumber">Receiver Account
 						Number</option>

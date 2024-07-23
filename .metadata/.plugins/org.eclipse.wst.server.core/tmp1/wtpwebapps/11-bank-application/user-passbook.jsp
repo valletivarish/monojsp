@@ -23,12 +23,16 @@ pageEncoding="UTF-8"%>
 	<div class="container-lg my-5">
 		<a class="btn btn-secondary p-2 px-4" href="user?command=user">Go
 			Back</a>
+		<div class="d-flex justify-content-end">
+			<button onclick="window.location.href='login.jsp'"
+				class="btn btn-danger">Logout</button>
+		</div>
 		<h1 class="text-center my-5">Passbook Details</h1>
 		<hr />
 		<p class="fs-3">
 			<span class="lead fs-3">Account Number :</span> ${bankAccountNumber}
 		</p>
-		<form action="user" method="get">
+		<form action="user" method="post">
 			<div class="col-sm-10">
 				<input type="hidden" name="command" value="passbook" /> <select
 					class="form-select form-select-lg mb-3"
@@ -43,8 +47,15 @@ pageEncoding="UTF-8"%>
 			<div class="d-flex my-3">
 				<input type="text" class="form-control" name="searchValue"
 					placeholder="Search by sender and receiver account number" />
-				<input type="submit" class="btn btn-primary mx-2" value="Search" />
-				<i class="fa-solid fa-filter"></i>
+					
+			</div>
+			<div class="d-flex my-3 align-items-center">
+				<label class="label me-2" for="from">From:</label> <input
+					type="date" id="from" name="from" class="form-control me-2">
+
+				<label class="label me-2" for="to">To:</label> <input type="date"
+					id="to" name="to" class="form-control me-2"> <input
+					type="submit" class="btn btn-primary" value="Search">
 			</div>
 		</form>
 
